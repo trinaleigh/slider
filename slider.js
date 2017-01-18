@@ -19,6 +19,7 @@ function reset(){
 // define time signature and tempo
 const signature = 4 // beats per measure
 const tempo = 120 // bpm
+const interval = 60*1000/tempo // time interval to play each beat
 
 // define sequence to display with # bars for each
 const sequence = {
@@ -44,10 +45,10 @@ function progress(onDeck){
 }
 
 function countdown(total){
-	console.log(total)
+
 	var startTime = new Date().getTime()
-	// display timer at zero
-	var update = setInterval(function(){
+
+	function showprogress(){
 		currentTime = new Date().getTime()
 		completed = currentTime - startTime
 		const ratio = Math.round(completed / total * 100);
@@ -56,25 +57,26 @@ function countdown(total){
 		} else {
 			clearInterval(update)}
 		}
-		,100);
-	}
+		
+	showprogress()
+	var update = setInterval(showprogress,interval)
+}
 
 function play(){
 	// progress twice to set up
 	progress(0);
 	progress(1);
-	countdown(sequence[0].length*(signature*60*1000/tempo))
+	countdown(sequence[0].length*(signature*interval))
 
 	// schedule each subsequent slide transition
 	duration = 0
 	for(i=0; i<Object.keys(sequence).length -1 ; i++) {
 		(function(count){
 		slide = sequence[count];
-		thisLength = slide.length*(signature*60*1000/tempo);
-		duration += thisLength;
+		duration += slide.length*(signature*interval);
 		setTimeout(function(){
 			progress(count+2);
-			countdown(sequence[count+1].length*(signature*60*1000/tempo));
+			countdown(sequence[count+1].length*(signature*interval));
 			},duration)
 		})(i);
 	}
