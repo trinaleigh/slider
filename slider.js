@@ -3,6 +3,9 @@ const firstImg = document.getElementById("first")
 const secondImg = document.getElementById("second")
 const thirdImg = document.getElementById("third")
 
+// get progress bar
+const progressFull = document.querySelector(".progress_full")
+const progressBar = document.querySelector(".progress_current")
 
 // use blank image for begging / end of sequence
 const blankPath = "images/blank.jpeg"
@@ -15,7 +18,7 @@ function reset(){
 
 // define time signature and tempo
 const signature = 4 // beats per measure
-const tempo = 80 // bpm
+const tempo = 120 // bpm
 
 // define sequence to display with # bars for each
 const sequence = {
@@ -40,18 +43,39 @@ function progress(onDeck){
 	}
 }
 
+function countdown(total){
+	console.log(total)
+	var startTime = new Date().getTime()
+	// display timer at zero
+	var update = setInterval(function(){
+		currentTime = new Date().getTime()
+		completed = currentTime - startTime
+		const ratio = Math.round(completed / total * 100);
+		if (ratio <= 100){
+		progressBar.style.flexBasis = `${ratio}%`
+		} else {
+			clearInterval(update)}
+		}
+		,100);
+	}
+
 function play(){
-	 // progress twice to set up
+	// progress twice to set up
 	progress(0);
 	progress(1);
+	countdown(sequence[0].length*(signature*60*1000/tempo))
 
 	// schedule each subsequent slide transition
 	duration = 0
-	for(i=0; i<Object.keys(sequence).length; i++) {
+	for(i=0; i<Object.keys(sequence).length -1 ; i++) {
 		(function(count){
 		slide = sequence[count];
-		duration += slide.length*(signature*60*1000/tempo);
-		setTimeout(function(){progress(count+2)},duration)
+		thisLength = slide.length*(signature*60*1000/tempo);
+		duration += thisLength;
+		setTimeout(function(){
+			progress(count+2);
+			countdown(sequence[count+1].length*(signature*60*1000/tempo));
+			},duration)
 		})(i);
 	}
 
@@ -59,3 +83,4 @@ function play(){
 
 reset()
 play()
+
