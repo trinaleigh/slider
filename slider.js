@@ -9,7 +9,7 @@ muteButton.addEventListener("click",muteUnmute)
 // get beep
 const beep = new Audio('audio/beep.mp3');
 
-// mute audio
+// mute/unmute audio
 function muteUnmute(){
 	beep.muted = !beep.muted;
 	if(beep.muted) {
@@ -37,10 +37,23 @@ function reset(){
 	thirdImg.src = blankPath;
 	}
 
-// define time signature and tempo
-const signature = 4 // beats per measure
-const tempo = 120 // bpm
-const interval = 60*1000/tempo // time interval to play each beat
+// get time and tempo inputs
+const inputSignature = document.getElementById("time_signature")
+inputSignature.addEventListener("change",updateTime)
+const inputTempo = document.getElementById("tempo")
+inputTempo.addEventListener("change",updateTime)
+updateTime()
+
+// // define time signature and tempo
+var signature = 4; // beats per measure
+var tempo = 60; // bpm
+var interval = 60*1000/tempo; // time interval to play each beat
+
+function updateTime(){
+	signature = inputSignature.value;
+	tempo = inputTempo.value;
+	interval = 60*1000/tempo;
+}
 
 // define sequence to display with # bars for each
 const sequence = {
@@ -118,6 +131,8 @@ function play(){
 
 function start(){
 	startButton.disabled = true;
+	inputSignature.disabled = true;
+	inputTempo.disabled = true;
 	reset();
 	play();
 }
