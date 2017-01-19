@@ -18,11 +18,17 @@
 		    </div>
 
 		   	<div class="right">
-			    <select id="time_signature" title ="time_signature">
-					  <option value="4">4/4</option>
-					  <option value="3">3/4</option>
-				</select>
-				<input type="number" id="tempo" min="20" max="200" step="1" value= "60">
+			    <div class="with_label">
+				    <select id="time_signature" title ="time_signature">
+						  <option value="4">4/4</option>
+						  <option value="3">3/4</option>
+					</select>
+					time
+				</div>
+				<div class="with_label">
+					<input type="number" id="tempo" min="20" max="200" step="1" value= "60">
+					bpm
+				</div>
 			    <button type="button" class="audio_control" id="mute"></button>
 		    </div>
 	    </div>
