@@ -49,19 +49,20 @@ function progress(onDeck){
 
 function countdown(total){
 
-	var startTime = new Date().getTime()
-
+	var num = 0
 	function showprogress(){
-		beep.currentTime = 0;
-		beep.play();
-		currentTime = new Date().getTime();
-		completed = currentTime - startTime;
-		const ratio = Math.round(completed / total * 100);
+		num += interval
+		const ratio = Math.round(num / total * 100);
+		console.log(ratio)
+		console.log(num)
 		if (ratio <= 100){
-		progressBar.style.flexBasis = `${ratio}%`
+			progressBar.style.flexBasis = `${ratio}%`
+			beep.currentTime = 0;
+			beep.play();
 		} else {
 			clearInterval(update)}
 		}
+		
 		
 	showprogress()
 	var update = setInterval(showprogress,interval)
@@ -75,13 +76,13 @@ function play(){
 	duration = (signature*interval) // one bar delay
 
 	setTimeout(function(){
-			progress(1);
-			countdown(sequence[0].length*(signature*interval));
-			},
-			duration)
+		progress(1);
+		countdown(sequence[0].length*(signature*interval));
+		},
+		duration)
 
 	// schedule each subsequent slide transition
-	for(i=0; i<Object.keys(sequence).length-1; i++) {
+	for (i=0; i<Object.keys(sequence).length-1; i++) {
 		(function(count){
 		slide = sequence[count];
 		duration += slide.length*(signature*interval);
