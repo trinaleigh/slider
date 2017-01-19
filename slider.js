@@ -7,6 +7,9 @@ const thirdImg = document.getElementById("third")
 const progressFull = document.querySelector(".progress_full")
 const progressBar = document.querySelector(".progress_current")
 
+// get beep
+const beep = new Audio('audio/beep.mp3');
+
 // use blank image for begging / end of sequence
 const blankPath = "images/blank.jpeg"
 
@@ -49,8 +52,10 @@ function countdown(total){
 	var startTime = new Date().getTime()
 
 	function showprogress(){
-		currentTime = new Date().getTime()
-		completed = currentTime - startTime
+		beep.currentTime = 0;
+		beep.play();
+		currentTime = new Date().getTime();
+		completed = currentTime - startTime;
 		const ratio = Math.round(completed / total * 100);
 		if (ratio <= 100){
 		progressBar.style.flexBasis = `${ratio}%`
@@ -70,14 +75,15 @@ function play(){
 
 	// schedule each subsequent slide transition
 	duration = 0
-	for(i=0; i<Object.keys(sequence).length -1 ; i++) {
+	for(i=0; i<Object.keys(sequence).length-1; i++) {
 		(function(count){
 		slide = sequence[count];
 		duration += slide.length*(signature*interval);
 		setTimeout(function(){
 			progress(count+2);
 			countdown(sequence[count+1].length*(signature*interval));
-			},duration)
+			},
+			duration)
 		})(i);
 	}
 
