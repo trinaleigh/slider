@@ -68,13 +68,19 @@ function countdown(total){
 }
 
 function play(){
-	// progress twice to set up
+	// progress once to set up
 	progress(0);
-	progress(1);
-	countdown(sequence[0].length*(signature*interval))
+
+	// schedule the first subsequent slide transition
+	duration = (signature*interval) // one bar delay
+
+	setTimeout(function(){
+			progress(1);
+			countdown(sequence[0].length*(signature*interval));
+			},
+			duration)
 
 	// schedule each subsequent slide transition
-	duration = 0
 	for(i=0; i<Object.keys(sequence).length-1; i++) {
 		(function(count){
 		slide = sequence[count];
