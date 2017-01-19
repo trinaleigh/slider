@@ -1,3 +1,24 @@
+// get start button
+const startButton = document.getElementById("start")
+startButton.addEventListener("click",start)
+
+// get mute button
+const muteButton = document.getElementById("mute")
+muteButton.addEventListener("click",muteUnmute)
+
+// get beep
+const beep = new Audio('audio/beep.mp3');
+
+// mute audio
+function muteUnmute(){
+	beep.muted = !beep.muted;
+	if(beep.muted) {
+		muteButton.classList.add("muted");
+	} else {
+		muteButton.classList.remove("muted");
+	}
+}
+
 // get 3 slide positions
 const firstImg = document.getElementById("first")
 const secondImg = document.getElementById("second")
@@ -6,9 +27,6 @@ const thirdImg = document.getElementById("third")
 // get progress bar
 const progressFull = document.querySelector(".progress_full")
 const progressBar = document.querySelector(".progress_current")
-
-// get beep
-const beep = new Audio('audio/beep.mp3');
 
 // use blank image for begging / end of sequence
 const blankPath = "images/blank.jpeg"
@@ -48,22 +66,23 @@ function progress(onDeck){
 }
 
 function countdown(total){
-
+	// count the number of intervals elapsed
 	var num = 0
+
+	// update the progress bar and emit sound
 	function showprogress(){
 		num += interval
 		const ratio = Math.round(num / total * 100);
-		console.log(ratio)
-		console.log(num)
 		if (ratio <= 100){
 			progressBar.style.flexBasis = `${ratio}%`
 			beep.currentTime = 0;
 			beep.play();
 		} else {
+			// at the end of this chord's duration, stop
 			clearInterval(update)}
 		}
-		
-		
+
+	// call once immediately and subsequently at each downbeat
 	showprogress()
 	var update = setInterval(showprogress,interval)
 }
@@ -76,6 +95,7 @@ function play(){
 	duration = (signature*interval) // one bar delay
 
 	setTimeout(function(){
+		progressFull.style.background = "var(--main)";
 		progress(1);
 		countdown(sequence[0].length*(signature*interval));
 		},
@@ -96,6 +116,13 @@ function play(){
 
 }
 
-reset()
-play()
+function start(){
+	startButton.disabled = true;
+	reset();
+	play();
+}
+
+
+
+
 
