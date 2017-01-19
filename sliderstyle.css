@@ -13,9 +13,17 @@ body {
   width: 100%;
   display: flex;
   flex-direction: row;
-  justify-content: left;
   align-items: center;
+}
 
+.left {
+  display: flex;
+  align-items: center;
+}
+
+.right {
+  display: flex;
+  align-items: center;
 }
 
 button {
