@@ -1,3 +1,14 @@
+// get setup button
+const setupButton = document.getElementById("setup")
+setupButton.addEventListener("click",setupMode)
+
+function setupMode(){
+	startButton.disabled = true;
+	inputSignature.disabled = true;
+	inputTempo.disabled = true;
+	muteButton.disabled = true;
+}
+
 // get start button
 const startButton = document.getElementById("start")
 startButton.addEventListener("click",start)
@@ -133,6 +144,7 @@ function start(){
 	startButton.disabled = true;
 	inputSignature.disabled = true;
 	inputTempo.disabled = true;
+	setupButton.disabled = true;
 	reset();
 	play();
 }

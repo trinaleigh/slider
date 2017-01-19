@@ -14,7 +14,8 @@
 
 	    <div class="input_container">
 		    <div class="left">
-			    <button type="button" id="start">Start</button>
+		    	<button type="button" id="setup">Setup</button>
+			    <button type="button" id="start">Play</button>
 		    </div>
 
 		   	<div class="right">
@@ -26,7 +27,7 @@
 					time
 				</div>
 				<div class="with_label">
-					<input type="number" id="tempo" min="20" max="200" step="1" value= "60">
+					<input type="number" id="tempo" min="20" max="200" step="1" value="60">
 					bpm
 				</div>
 			    <button type="button" class="audio_control" id="mute"></button>
@@ -45,9 +46,14 @@
 		    	<img id="third">
 		    </div>
 	    </div>
+	    
 	    <div class = "progress">
 	    	<div class="progress_full">
         	<div class="progress_current"></div></div>
+	    </div>
+
+	   	<div class = "setup">
+
 	    </div>
 
 		<script type="text/javascript" src="slider.js"></script>

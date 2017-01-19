@@ -106,13 +106,17 @@ input:disabled {
   padding: 5px 5px;
   height: 62px;
   width: 62px;
- }
+}
 
- .muted {
+ .audio_control:disabled {
   background: url("images/audio_disabled.svg") no-repeat;
   background-size: 100%;
-  border: 2px solid var(--disabled);
- }
+}
+
+ .muted {
+  background: url("images/audio_muted.svg") no-repeat;
+  background-size: 100%;
+}
 
 .container {
 	width: 100%;
