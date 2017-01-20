@@ -1,13 +1,61 @@
+const controls = document.querySelectorAll("button, input,select")
+
+// define sequence to display with # bars for each
+const sequence = {
+	0 : {item: "C", length: 2},
+	1 : {item: "Am", length: 2},
+	2 : {item: "F", length: 1},
+	3 : {item: "G", length: 1},
+	4 : {item: "C", length: 2}
+}
+
 // get setup button
 const setupButton = document.getElementById("setup")
 setupButton.addEventListener("click",setupMode)
 
 function setupMode(){
-	startButton.disabled = true;
-	inputSignature.disabled = true;
-	inputTempo.disabled = true;
-	muteButton.disabled = true;
+	controls.forEach(function(control){
+		if(control != setupButton) {
+			control.disabled = true;
+		}
+	})
 }
+
+// get library button
+const libraryButton = document.getElementById("library")
+libraryButton.addEventListener("click",libraryMode)
+
+const libraryList = document.getElementById("library_list")
+const songList = document.getElementById("song")
+
+const pickSong = document.getElementById("pick_song")
+
+	function libraryMode(){
+		controls.forEach(function(control){
+			if(! [libraryButton, songList, pickSong].includes(control)) {
+				control.disabled = true;
+			}
+		})
+		libraryList.style.display = "flex"
+		pickSong.addEventListener("click",selectSong)
+
+		function selectSong(){
+			
+			$.ajax({
+			    url: `songs/${songList.value}.json`,
+			    success: function (data) {
+			        console.log(data);
+			    }
+			});
+
+		controls.forEach(function(control){
+			control.disabled = false;
+		})
+			
+			libraryList.style.display = "none"
+			
+		}
+	}
 
 // get start button
 const startButton = document.getElementById("start")
@@ -64,15 +112,6 @@ function updateTime(){
 	signature = inputSignature.value;
 	tempo = inputTempo.value;
 	interval = 60*1000/tempo;
-}
-
-// define sequence to display with # bars for each
-const sequence = {
-	0 : {item: "C", length: 2},
-	1 : {item: "Am", length: 2},
-	2 : {item: "F", length: 1},
-	3 : {item: "G", length: 1},
-	4 : {item: "C", length: 2}
 }
 
 function progress(onDeck){
@@ -141,10 +180,11 @@ function play(){
 }
 
 function start(){
-	startButton.disabled = true;
-	inputSignature.disabled = true;
-	inputTempo.disabled = true;
-	setupButton.disabled = true;
+	controls.forEach(function(control){
+		if(control != muteButton) {
+			control.disabled = true;
+		}
+	})
 	reset();
 	play();
 }

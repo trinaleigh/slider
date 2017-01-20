@@ -14,7 +14,8 @@
 
 	    <div class="input_container">
 		    <div class="left">
-		    	<button type="button" id="setup">Setup</button>
+		    	<button type="button" id="library">Library</button>
+		    	<button type="button" id="setup">Custom</button>
 			    <button type="button" id="start">Play</button>
 		    </div>
 
@@ -32,6 +33,14 @@
 				</div>
 			    <button type="button" class="audio_control" id="mute"></button>
 		    </div>
+	    </div>
+
+	    <div class="mode" id="library_list">
+			<select id="song" title ="song">
+				  <option value="1">song 1</option>
+				  <option value="2">song 2</option>
+			</select>
+			<button type="button" id="pick_song">Select</button>
 	    </div>
 
 	    <div class = "container">
@@ -52,7 +61,7 @@
         	<div class="progress_current"></div></div>
 	    </div>
 
-	   	<div class = "setup">
+	   	<div class = "setup"></div>
 
 	    </div>
 
