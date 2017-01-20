@@ -1,61 +1,45 @@
+// get all controls to easily enable/disable
 const controls = document.querySelectorAll("button, input,select")
-
-// define sequence to display with # bars for each
-const sequence = {
-	0 : {item: "C", length: 2},
-	1 : {item: "Am", length: 2},
-	2 : {item: "F", length: 1},
-	3 : {item: "G", length: 1},
-	4 : {item: "C", length: 2}
-}
-
-// get setup button
-const setupButton = document.getElementById("setup")
-setupButton.addEventListener("click",setupMode)
-
-function setupMode(){
-	controls.forEach(function(control){
-		if(control != setupButton) {
-			control.disabled = true;
-		}
-	})
-}
 
 // get library button
 const libraryButton = document.getElementById("library")
 libraryButton.addEventListener("click",libraryMode)
 
+// get library settings
 const libraryList = document.getElementById("library_list")
 const songList = document.getElementById("song")
-
 const pickSong = document.getElementById("pick_song")
 
-	function libraryMode(){
-		controls.forEach(function(control){
-			if(! [libraryButton, songList, pickSong].includes(control)) {
-				control.disabled = true;
-			}
-		})
-		libraryList.style.display = "flex"
-		pickSong.addEventListener("click",selectSong)
+// in library mode, allow song change, exit up hitting "Select"
+function libraryMode(){
+	controls.forEach(function(control){
+		if(! [libraryButton, songList, pickSong].includes(control)) {
+			control.disabled = true;
+		}
+	})
+	libraryList.style.display = "flex"
 
-		function selectSong(){
-			
-			$.ajax({
-			    url: `songs/${songList.value}.json`,
-			    success: function (data) {
-			        console.log(data);
-			    }
-			});
+	pickSong.addEventListener("click",selectSong)
 
+	function selectSong(){
+		
 		controls.forEach(function(control){
 			control.disabled = false;
 		})
-			
-			libraryList.style.display = "none"
-			
-		}
+		
+		libraryList.style.display = "none"
 	}
+}
+
+// get the JSON file corresponding to the song selected
+function getChords(callback){
+	$.ajax({
+	    url: `library/${songList.value}.json`,
+	    success: function (data) {
+	        callback(data);
+	    }
+	});
+}
 
 // get start button
 const startButton = document.getElementById("start")
@@ -114,7 +98,7 @@ function updateTime(){
 	interval = 60*1000/tempo;
 }
 
-function progress(onDeck){
+function progress(sequence,onDeck){
 	// if there are slides remaining, add the next one on deck
 	if(onDeck < Object.keys(sequence).length){
 		firstImg.src = secondImg.src
@@ -150,16 +134,16 @@ function countdown(total){
 	var update = setInterval(showprogress,interval)
 }
 
-function play(){
+function play(sequence){
 	// progress once to set up
-	progress(0);
+	progress(sequence,0);
 
 	// schedule the first subsequent slide transition
 	duration = (signature*interval) // one bar delay
 
 	setTimeout(function(){
 		progressFull.style.background = "var(--main)";
-		progress(1);
+		progress(sequence,1);
 		countdown(sequence[0].length*(signature*interval));
 		},
 		duration)
@@ -170,15 +154,15 @@ function play(){
 		slide = sequence[count];
 		duration += slide.length*(signature*interval);
 		setTimeout(function(){
-			progress(count+2);
+			progress(sequence,count+2);
 			countdown(sequence[count+1].length*(signature*interval));
-			},
-			duration)
+			},duration)
 		})(i);
 	}
 
 }
 
+// after hitting start, disable controls, get chords from the JSON file, and play
 function start(){
 	controls.forEach(function(control){
 		if(control != muteButton) {
@@ -186,7 +170,7 @@ function start(){
 		}
 	})
 	reset();
-	play();
+	getChords(play);
 }
 
 
