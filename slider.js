@@ -9,6 +9,8 @@ libraryButton.addEventListener("click",libraryMode)
 const libraryList = document.getElementById("library_list")
 const songList = document.getElementById("song")
 const pickSong = document.getElementById("pick_song")
+const songLabel = document.getElementById("current_song")
+songLabel.innerHTML = songList[songList.selectedIndex].text
 
 // in library mode, allow song change, exit up hitting "Select"
 function libraryMode(){
@@ -28,6 +30,8 @@ function libraryMode(){
 		})
 		
 		libraryList.style.display = "none"
+
+		songLabel.innerHTML = songList[songList.selectedIndex].text
 	}
 }
 
@@ -75,6 +79,8 @@ const progressBar = document.querySelector(".progress_current")
 const blankPath = "images/blank.jpeg"
 
 function reset(){
+	progressFull.style.background = "none";
+	progressBar.style.flexBasis = "0%";
 	firstImg.src = blankPath;
 	secondImg.src = blankPath;
 	thirdImg.src = blankPath;
@@ -88,8 +94,8 @@ inputTempo.addEventListener("change",updateTime)
 updateTime()
 
 // // define time signature and tempo
-var signature = 4; // beats per measure
-var tempo = 60; // bpm
+var signature = inputSignature.value; // beats per measure
+var tempo = inputTempo.value; // bpm
 var interval = 60*1000/tempo; // time interval to play each beat
 
 function updateTime(){
@@ -144,7 +150,7 @@ function play(sequence){
 	setTimeout(function(){
 		progressFull.style.background = "var(--main)";
 		progress(sequence,1);
-		countdown(sequence[0].length*(signature*interval));
+		countdown(sequence[0].bars*(signature*interval));
 		},
 		duration)
 
@@ -152,13 +158,22 @@ function play(sequence){
 	for (i=0; i<Object.keys(sequence).length-1; i++) {
 		(function(count){
 		slide = sequence[count];
-		duration += slide.length*(signature*interval);
+		duration += slide.bars*(signature*interval);
 		setTimeout(function(){
 			progress(sequence,count+2);
-			countdown(sequence[count+1].length*(signature*interval));
+			countdown(sequence[count+1].bars*(signature*interval));
 			},duration)
 		})(i);
 	}
+
+	// schedule reset following the final chord 
+	duration += sequence[Object.keys(sequence).length-1].bars*(signature*interval)
+	setTimeout(function(){
+		reset();
+		controls.forEach(function(control){
+			control.disabled = false;
+		})
+	},duration)
 
 }
 

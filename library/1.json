@@ -1,7 +1,7 @@
 {
-	"0" : {"item": "C", "length": "2"},
-	"1" : {"item": "Am", "length": "2"},
-	"2" : {"item": "F", "length": "1"},
-	"3" : {"item": "G", "length": "1"},
-	"4" : {"item": "C", "length": "2"}
+	"0" : {"item": "C", "bars": "2"},
+	"1" : {"item": "Am", "bars": "2"},
+	"2" : {"item": "F", "bars": "1"},
+	"3" : {"item": "G", "bars": "1"},
+	"4" : {"item": "C", "bars": "2"}
 }
