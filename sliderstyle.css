@@ -172,6 +172,20 @@ div {
 	display: none;
 	width: 100%;
 	flex-direction: row;
-  	justify-content: center;
-  	align-items: center;
+  justify-content: center;
+  align-items: center;
+}
+
+.countin {
+  display: none;
+  width: 33%;
+  flex-direction: row;
+  justify-content: center; 
+}
+
+circle {
+  display: none;
+  stroke: var(--secondary);
+  stroke-width: 5px;
+  fill: none;
 }

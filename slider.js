@@ -1,18 +1,16 @@
-// get all controls to easily enable/disable
+// get all user controls to easily enable/disable
 const controls = document.querySelectorAll("button, input,select")
 
-// get library button
+// get library button and settings
 const libraryButton = document.getElementById("library")
 libraryButton.addEventListener("click",libraryMode)
-
-// get library settings
 const libraryList = document.getElementById("library_list")
 const songList = document.getElementById("song")
 const pickSong = document.getElementById("pick_song")
 const songLabel = document.getElementById("current_song")
 songLabel.innerHTML = songList[songList.selectedIndex].text
 
-// in library mode, allow song change, exit up hitting "Select"
+// in library mode, allow song change
 function libraryMode(){
 	controls.forEach(function(control){
 		if(! [libraryButton, songList, pickSong].includes(control)) {
@@ -23,6 +21,7 @@ function libraryMode(){
 
 	pickSong.addEventListener("click",selectSong)
 
+	// upom hitting select, exit (back to main view) and update the song label
 	function selectSong(){
 		
 		controls.forEach(function(control){
@@ -33,16 +32,6 @@ function libraryMode(){
 
 		songLabel.innerHTML = songList[songList.selectedIndex].text
 	}
-}
-
-// get the JSON file corresponding to the song selected
-function getChords(callback){
-	$.ajax({
-	    url: `library/${songList.value}.json`,
-	    success: function (data) {
-	        callback(data);
-	    }
-	});
 }
 
 // get start button
@@ -140,9 +129,45 @@ function countdown(total){
 	var update = setInterval(showprogress,interval)
 }
 
+circles = document.querySelectorAll("circle");
+countin = document.getElementById("countin");
+
+
 function play(sequence){
-	// progress once to set up
+	// setup: progress once and show empty circles
 	progress(sequence,0);
+
+	for(i=0; i<signature; i++){
+		circles[i].style.display = "block"
+		}
+
+	countin.style.display = "flex"
+
+	function clickCircles(){
+
+		// count the number of intervals elapsed
+		var num = 0
+
+		// update the circles and emit sound
+		function fillCircles(){
+			if (num < signature){
+				circles[num].style.fill = `var(--secondary)`
+				beep.currentTime = 0;
+				beep.play();
+			} else {
+				// at the end of this chord's duration, stop
+				clearInterval(update)
+				countin.style.display = "none"}
+			num += 1
+			}
+			
+		fillCircles()
+		update = setInterval(fillCircles,interval)
+
+	}
+
+	// show the circles to count down
+	setTimeout(clickCircles,0)
 
 	// schedule the first subsequent slide transition
 	duration = (signature*interval) // one bar delay
@@ -177,6 +202,16 @@ function play(sequence){
 
 }
 
+// get the JSON file corresponding to the song selected
+function getChords(callback){
+	$.ajax({
+	    url: `library/${songList.value}.json`,
+	    success: function (data) {
+	        callback(data);
+	    }
+	});
+}
+
 // after hitting start, disable controls, get chords from the JSON file, and play
 function start(){
 	controls.forEach(function(control){
@@ -187,7 +222,6 @@ function start(){
 	reset();
 	getChords(play);
 }
-
 
 
 
