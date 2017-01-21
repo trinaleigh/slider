@@ -61,6 +61,7 @@ const secondImg = document.getElementById("second")
 const thirdImg = document.getElementById("third")
 
 // get progress bar
+const progressBox = document.querySelector(".progress")
 const progressFull = document.querySelector(".progress_full")
 const progressBar = document.querySelector(".progress_current")
 
@@ -68,6 +69,7 @@ const progressBar = document.querySelector(".progress_current")
 const blankPath = "images/blank.jpeg"
 
 function reset(){
+	progressBox.style.display = "none"
 	progressFull.style.background = "none";
 	progressBar.style.flexBasis = "0%";
 	firstImg.src = blankPath;
@@ -157,7 +159,8 @@ function play(sequence){
 			} else {
 				// at the end of this chord's duration, stop
 				clearInterval(update)
-				countin.style.display = "none"}
+				countin.style.display = "none"
+				progressBox.style.display = "flex"}
 			num += 1
 			}
 			

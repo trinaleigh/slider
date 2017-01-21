@@ -146,10 +146,12 @@ div {
 }
 
 .progress{
-  display: flex;
+  display: none;
   flex-direction: row;
+  height: 40px;
   width: 33%;
   background: none;
+  justify-content: center;
 }
 
 .progress_full {
