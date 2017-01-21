@@ -73,6 +73,7 @@ function reset(){
 	progressFull.style.background = "none";
 	progressBar.style.flexBasis = "0%";
 	circles.forEach(circle => circle.style.fill = `none`)
+	circles.forEach(circle => circle.style.display = `none`)
 	firstImg.src = blankPath;
 	secondImg.src = blankPath;
 	thirdImg.src = blankPath;
