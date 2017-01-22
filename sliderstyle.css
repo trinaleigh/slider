@@ -69,6 +69,10 @@ input {
   appearance: none;
 }
 
+input:focus {
+  outline: none;
+}
+
 input[type=number]::-webkit-inner-spin-button, 
 input[type=number]::-webkit-outer-spin-button { 
     -webkit-appearance: none;
@@ -88,6 +92,10 @@ select {
   appearance: none;
   -webkit-border-radius: 0px;
   -webkit-appearance: none;
+}
+
+select:focus {
+  outline: none;
 }
 
 select:disabled {
