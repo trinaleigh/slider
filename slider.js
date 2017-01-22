@@ -99,10 +99,10 @@ function updateTime(){
 
 function progress(sequence,onDeck){
 	// if there are slides remaining, add the next one on deck
-	if(onDeck < Object.keys(sequence).length){
+	if(onDeck < Object.keys(sequence.chords).length){
 		firstImg.src = secondImg.src
 		secondImg.src = thirdImg.src
-		thirdImg.src = `images/tabs/${sequence[onDeck].item}.jpeg`
+		thirdImg.src = `images/tabs/${sequence.chords[onDeck].item}.jpeg`
 	// otherwise, add blank slide
 	} else {
 		firstImg.src = secondImg.src
@@ -180,24 +180,24 @@ function play(sequence){
 	setTimeout(function(){
 		progressFull.style.background = "var(--main)";
 		progress(sequence,1);
-		countdown(sequence[0].bars*(signature*interval));
+		countdown(sequence.chords[0].bars*(signature*interval));
 		},
 		duration)
 
 	// schedule each subsequent slide transition
-	for (i=0; i<Object.keys(sequence).length-1; i++) {
+	for (i=0; i<Object.keys(sequence.chords).length-1; i++) {
 		(function(count){
-		slide = sequence[count];
+		slide = sequence.chords[count];
 		duration += slide.bars*(signature*interval);
 		setTimeout(function(){
 			progress(sequence,count+2);
-			countdown(sequence[count+1].bars*(signature*interval));
+			countdown(sequence.chords[count+1].bars*(signature*interval));
 			},duration)
 		})(i);
 	}
 
 	// schedule reset following the final chord 
-	duration += sequence[Object.keys(sequence).length-1].bars*(signature*interval)
+	duration += sequence.chords[Object.keys(sequence.chords).length-1].bars*(signature*interval)
 	setTimeout(function(){
 		reset();
 		controls.forEach(function(control){
