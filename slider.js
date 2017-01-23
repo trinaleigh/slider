@@ -40,6 +40,20 @@ function libraryMode(){
 const startButton = document.getElementById("start")
 startButton.addEventListener("click",start)
 
+// get stop button
+const stopButton = document.getElementById("stop")
+stopButton.addEventListener("click",stopAll)
+
+function stopAll(){
+	// clear all the timers and reset
+	var lastTimer = setTimeout(function(){}, 0);
+
+	for (var i=0; i < lastTimer; i++) { 
+	    clearTimeout(i);
+	}
+	reset();
+}
+
 // get looping button
 var looping = false;
 const loopButton = document.getElementById("loop")
@@ -91,8 +105,12 @@ const progressBar = document.querySelector(".progress_current")
 // use blank image for begging / end of sequence
 const blankPath = "images/blank.jpeg"
 
-// to reset: hide the progress bar and circles, start slideshow with blank images
+// to reset: enable controls, hide the progress bar and circles, start slideshow with blank images
 function reset(){
+	controls.forEach(function(control){
+		control.disabled = false;
+		})
+	stopButton.disabled = true;
 	progressBox.style.display = "none"
 	progressFull.style.background = "none";
 	progressBar.style.flexBasis = "0%";
@@ -245,14 +263,11 @@ function play(sequence){
 	} 
 
 	function endSong(sequence){	
-		// schedule reset following the final chord
+		// add time for the last chord
 		duration += sequence.chords[Object.keys(sequence.chords).length-1].bars*(signature*interval)
-
+		// schedule reset 
 		setTimeout(function(){
 			reset();
-			controls.forEach(function(control){
-				control.disabled = false;
-			})
 		},duration)}
 }
 
@@ -268,12 +283,13 @@ function getChords(callback){
 
 // after hitting start, disable controls, get chords from the JSON file, and play
 function start(){
+	reset();
 	controls.forEach(function(control){
 		if(control != muteButton) {
 			control.disabled = true;
 		}
 	})
-	reset();
+	stopButton.disabled = false;
 	getChords(play);
 }
 

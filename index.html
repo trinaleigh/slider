@@ -14,11 +14,8 @@
 
 	    <div class="input_container">
 		    <div class="left">
-			    <button type="button" id="start">Play</button>
-			    <div class="with_label">
-			    	<button type="button" class="loop" id="loop"></button>
-			    	<span id="loop_label">1x</span>
-			    </div>
+			    <button type="button" id="start">►</button>
+			    <button type="button" id="stop" disabled>■</button>
 		    </div>
 
 		   	<div class="right">
@@ -37,6 +34,10 @@
 					<input type="number" id="tempo" min="20" max="200" step="1" value="100">
 					bpm
 				</div>
+				<div class="with_label">
+			    	<button type="button" class="loop" id="loop"></button>
+			    	<span id="loop_label">1x</span>
+			    </div>
 			    <button type="button" class="audio_control" id="mute"></button>
 		    </div>
 	    </div>
