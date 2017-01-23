@@ -17,11 +17,13 @@ function libraryMode(){
 			control.disabled = true;
 		}
 	})
+
+	// show the select list of songs and listen for "select" button
 	libraryList.style.display = "flex"
 
 	pickSong.addEventListener("click",selectSong)
 
-	// upom hitting select, exit (back to main view) and update the song label
+	// upon hitting select, exit (back to main view) and update the song label
 	function selectSong(){
 		
 		controls.forEach(function(control){
@@ -38,6 +40,25 @@ function libraryMode(){
 const startButton = document.getElementById("start")
 startButton.addEventListener("click",start)
 
+// get looping button
+var looping = false;
+const loopButton = document.getElementById("loop")
+loopButton.addEventListener("click",toggleLoop)
+const loopLabel = document.getElementById("loop_label")
+
+function toggleLoop(){
+	// turn looping on/off
+	looping = !looping
+	// change the button display
+	if(looping) {
+		loopButton.classList.add("looping");
+		loopLabel.innerHTML = "Loop";
+	} else {
+		loopButton.classList.remove("looping");
+		loopLabel.innerHTML = "1x";
+	}
+}
+
 // get mute button
 const muteButton = document.getElementById("mute")
 muteButton.addEventListener("click",muteUnmute)
@@ -45,9 +66,11 @@ muteButton.addEventListener("click",muteUnmute)
 // get beep
 const beep = new Audio('audio/beep.mp3');
 
-// mute/unmute audio
+// mute/unmute audio when button toggled
 function muteUnmute(){
+	// mute/unmute audio file
 	beep.muted = !beep.muted;
+	// change the button display
 	if(beep.muted) {
 		muteButton.classList.add("muted");
 	} else {
@@ -68,6 +91,7 @@ const progressBar = document.querySelector(".progress_current")
 // use blank image for begging / end of sequence
 const blankPath = "images/blank.jpeg"
 
+// to reset: hide the progress bar and circles, start slideshow with blank images
 function reset(){
 	progressBox.style.display = "none"
 	progressFull.style.background = "none";
@@ -84,17 +108,16 @@ const inputSignature = document.getElementById("time_signature")
 inputSignature.addEventListener("change",updateTime)
 const inputTempo = document.getElementById("tempo")
 inputTempo.addEventListener("change",updateTime)
+var signature
+var tempo
+var interval
 updateTime()
 
-// // define time signature and tempo
-var signature = inputSignature.value; // beats per measure
-var tempo = inputTempo.value; // bpm
-var interval = 60*1000/tempo; // time interval to play each beat
-
+// update time signature and tempo to match current inputs
 function updateTime(){
-	signature = inputSignature.value;
-	tempo = inputTempo.value;
-	interval = 60*1000/tempo;
+	signature = inputSignature.value; // beats per measure
+	tempo = inputTempo.value; // bpm
+	interval = 60*1000/tempo; // time interval to play each beat
 }
 
 function progress(sequence,onDeck){
@@ -103,6 +126,11 @@ function progress(sequence,onDeck){
 		firstImg.src = secondImg.src
 		secondImg.src = thirdImg.src
 		thirdImg.src = `images/tabs/${sequence.chords[onDeck].item}.jpeg`
+	// if looping, go back to the start
+	} else if (looping == true){
+		firstImg.src = secondImg.src
+		secondImg.src = thirdImg.src
+		thirdImg.src = `images/tabs/${sequence.chords[0].item}.jpeg`
 	// otherwise, add blank slide
 	} else {
 		firstImg.src = secondImg.src
@@ -133,6 +161,7 @@ function countdown(total){
 	var update = setInterval(showprogress,interval)
 }
 
+// get circles used to count into the song
 circles = document.querySelectorAll("circle");
 countin = document.getElementById("countin");
 
@@ -171,40 +200,60 @@ function play(sequence){
 
 	}
 
-	// show the circles to count down
-	setTimeout(clickCircles,0)
+	// immediately show the circles to count down
+	duration = 0
+	setTimeout(clickCircles,duration)
+	duration += (signature*interval) // add one bar delay for count in
 
-	// schedule the first subsequent slide transition
-	duration = (signature*interval) // one bar delay
-
-	setTimeout(function(){
-		progressFull.style.background = "var(--main)";
-		progress(sequence,1);
-		countdown(sequence.chords[0].bars*(signature*interval));
-		},
-		duration)
-
-	// schedule each subsequent slide transition
-	for (i=0; i<Object.keys(sequence.chords).length-1; i++) {
-		(function(count){
-		slide = sequence.chords[count];
-		duration += slide.bars*(signature*interval);
-		setTimeout(function(){
-			progress(sequence,count+2);
-			countdown(sequence.chords[count+1].bars*(signature*interval));
-			},duration)
-		})(i);
+	fullSlideshow(sequence,0)
+	if(looping == true){
+		loop(sequence);
+	} else {
+		endSong(sequence);
 	}
 
-	// schedule reset following the final chord 
-	duration += sequence.chords[Object.keys(sequence.chords).length-1].bars*(signature*interval)
-	setTimeout(function(){
-		reset();
-		controls.forEach(function(control){
-			control.disabled = false;
-		})
-	},duration)
+	function fullSlideshow(sequence){
+		// schedule the first slide transition
+		setTimeout(function(){
+			progressFull.style.background = "var(--main)";
+			progress(sequence,1);
+			countdown(sequence.chords[0].bars*(signature*interval));
+			},
+			duration)
 
+		// schedule each subsequent slide transition
+		for (i=0; i<Object.keys(sequence.chords).length-1; i++) {
+			(function(count){
+			slide = sequence.chords[count];
+			duration += slide.bars*(signature*interval);
+			setTimeout(function(){
+				progress(sequence,count+2);
+				countdown(sequence.chords[count+1].bars*(signature*interval));
+				},duration)
+			})(i);
+		}
+	}
+
+	function loop(sequence){
+		for (loopNum=1; loopNum<20; loopNum++){
+			// add time for the last chord
+			duration += sequence.chords[Object.keys(sequence.chords).length-1].bars*(signature*interval)
+			// play again up to 20x
+			fullSlideshow(sequence)
+		}
+		endSong(sequence)
+	} 
+
+	function endSong(sequence){	
+		// schedule reset following the final chord
+		duration += sequence.chords[Object.keys(sequence.chords).length-1].bars*(signature*interval)
+
+		setTimeout(function(){
+			reset();
+			controls.forEach(function(control){
+				control.disabled = false;
+			})
+		},duration)}
 }
 
 // get the JSON file corresponding to the song selected

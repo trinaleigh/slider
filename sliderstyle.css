@@ -116,13 +116,36 @@ input:disabled {
   width: 62px;
 }
 
- .audio_control:disabled {
+.audio_control:disabled {
   background: url("images/audio_disabled.svg") no-repeat;
   background-size: 100%;
 }
 
- .muted {
+.muted {
   background: url("images/audio_muted.svg") no-repeat;
+  background-size: 100%;
+}
+
+.loop {
+  background: url("images/once_through.svg") no-repeat;
+  background-size: 100%;
+  padding: 5px 5px;
+  height: 62px;
+  width: 62px;
+}
+
+.loop:disabled {
+  background: url("images/once_through_disabled.svg") no-repeat;
+  background-size: 100%;
+}
+
+.looping {
+  background: url("images/loop.svg") no-repeat;
+  background-size: 100%;
+}
+
+.looping:disabled {
+  background: url("images/loop_disabled.svg") no-repeat;
   background-size: 100%;
 }
 
