@@ -1,6 +1,8 @@
 {"chords" : [ 
-	{"item": "F", "bars": "2"},
-	{"item": "A", "bars": "2"},
-	{"item": "F", "bars": "2"},
-	{"item": "A", "bars": "2"}]
+	{"item": "C7", "bars": "4"},
+	{"item": "F7", "bars": "2"},
+	{"item": "C7", "bars": "2"},
+	{"item": "Dm7", "bars": "1"},
+	{"item": "G7", "bars": "1"},
+	{"item": "C7", "bars": "2"}]
 }
