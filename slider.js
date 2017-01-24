@@ -1,116 +1,93 @@
 // get all user controls to easily enable/disable
-const controls = document.querySelectorAll("button, input,select")
+const controls = document.querySelectorAll("button, input,select");
 
 // get library button and settings
-const libraryButton = document.getElementById("library")
-libraryButton.addEventListener("click",filterControlsLibrary)
-const libraryList = document.getElementById("library_list")
-const songList = document.getElementById("song")
-const pickSong = document.getElementById("pick_song")
-const songLabel = document.getElementById("current_song")
-songLabel.innerHTML = songList[songList.selectedIndex].text
+const libraryButton = document.getElementById("library");
+libraryButton.addEventListener("click", function() {openLibrary(controls, [libraryButton, songList, pickSong], libraryList, pickSong, songLabel, songList)});
+const libraryList = document.getElementById("library_list");
+const songList = document.getElementById("song");
+const pickSong = document.getElementById("pick_song");
+const songLabel = document.getElementById("current_song");
+songLabel.innerHTML = songList[songList.selectedIndex].text;
 
 // get start button
-const startButton = document.getElementById("start")
-startButton.addEventListener("click",start)
+const startButton = document.getElementById("start");
+startButton.addEventListener("click",start);
 
 // get stop button
-const stopButton = document.getElementById("stop")
-stopButton.addEventListener("click",stopAll)
+const stopButton = document.getElementById("stop");
+stopButton.addEventListener("click",stopAll);
 
 // get looping button
-const loopButton = document.getElementById("loop")
-const loopLabel = document.getElementById("loop_label")
-loopButton.addEventListener("click",function(){toggleLoop(this, loopLabel)})
+const loopButton = document.getElementById("loop");
+const loopLabel = document.getElementById("loop_label");
+loopButton.addEventListener("click",function(){toggleLoop(this, loopLabel)});
 
 // get beep
 const beep = new Audio('audio/beep.mp3');
 
 // get mute button
-const muteButton = document.getElementById("mute")
-muteButton.addEventListener("click",function(){muteUnmute(this, beep)})
+const muteButton = document.getElementById("mute");
+muteButton.addEventListener("click",function(){muteUnmute(this, beep)});
 
 // get time and tempo inputs
-const inputSignature = document.getElementById("time_signature")
-const inputTempo = document.getElementById("tempo")
+const inputSignature = document.getElementById("time_signature");
+const inputTempo = document.getElementById("tempo");
 
 // get 3 slide positions
-const firstImg = document.getElementById("first")
-const secondImg = document.getElementById("second")
-const thirdImg = document.getElementById("third")
+const firstImg = document.getElementById("first");
+const secondImg = document.getElementById("second");
+const thirdImg = document.getElementById("third");
 
 // get progress bar
-const progressBox = document.querySelector(".progress")
-const progressFull = document.querySelector(".progress_full")
-const progressBar = document.querySelector(".progress_current")
+const progressBox = document.querySelector(".progress");
+const progressFull = document.querySelector(".progress_full");
+const progressBar = document.querySelector(".progress_current");
 
 // use blank image for begging / end of sequence
-const blankPath = "images/blank.jpeg"
+const blankPath = "images/blank.jpeg";
 
 // get circles used to count into the song
 const circles = document.querySelectorAll("circle");
 const countin = document.getElementById("countin");
 
 // update time signature and tempo to match current inputs
-function getSettings(){
-	currentSong = songList.value; // song selected
-	signature = inputSignature.value; // beats per measure
-	tempo = inputTempo.value; // bpm
+function getSettings(songControl, signatureControl, tempoControl, loopingControl){
+	currentSong = songControl.value; // song selected
+	signature = signatureControl.value; // beats per measure
+	tempo = tempoControl.value; // bpm
 	interval = 60*1000/tempo; // time interval to play each beat
-	looping = loopButton.classList.contains("looping") // true or false
+	looping = loopingControl.classList.contains("looping") // true or false
 
 	return currentSong, signature, tempo, interval, looping;
 }
 
-// enable/disable controls corresponding to "playing" mode
-function filterControlsPlaying(){
-	controls.forEach(function(control){
-		if (control != muteButton) {
-			control.disabled = true;
+function filterControls(allControls, exceptions, direction){
+	// direction should be "on" or "off"
+	allControls.forEach(function(control){
+		if (! exceptions.includes(control)){
+			control.disabled = (direction == "off" ? true : false);
 		}
 	})
-	stopButton.disabled = false;
-}
-
-// enable/disable controls corresponding to "stopped" mode
-function filterControlsStopped(){
-	controls.forEach(function(control){
-		control.disabled = false;
-		})
-	stopButton.disabled = true;
-}
-
-function filterControlsLibrary(){
-	controls.forEach(function(control){
-		if (! [libraryButton, songList, pickSong].includes(control)) {
-			control.disabled = true;
-		}
+	exceptions.forEach(function(control){
+		control.disabled = (direction == "off" ? false : true);
 	})
+}
+
+function openLibrary(allControls, exceptions, modeDiv, submitter, modeLabel, modeList){
+	// enable library controls only
+	filterControls(allControls, exceptions, "off")
 	// show the list of songs and listen for "select" button
-	libraryList.style.display = "flex"
-	pickSong.addEventListener("click",selectSong)
+	modeDiv.style.display = "flex"
+	submitter.addEventListener("click", function() {exitMode(allControls, modeDiv, modeLabel, modeList)})
 }
 
-function selectSong(){
+function exitMode(allControls, modeDiv, modeLabel, modeList){
 	// exit (back to main view) 
-	controls.forEach(function(control){
-		control.disabled = false;
-	})
-	// update the song label
-	libraryList.style.display = "none"
-	songLabel.innerHTML = songList[songList.selectedIndex].text
-}
-
-function stopAll(){
-	// clear all the timers and reset
-	var lastTimer = setTimeout(function(){}, 0);
-
-	for (var i=0; i < lastTimer; i++) { 
-	    clearTimeout(i);
-	}
-
-	filterControlsStopped();
-	reset();
+	filterControls(controls, [], "on")
+	// update song label to the selection
+	modeDiv.style.display = "none"
+	modeLabel.innerHTML = modeList[modeList.selectedIndex].text
 }
 
 function toggleLoop(btn, lbl){
@@ -138,10 +115,22 @@ function muteUnmute(btn, sound){
 
 // after hitting start, disable controls, get chords from the JSON file, and play
 function start(){
-	var songChoice, signature, tempo, interval, looping = getSettings(); // get user inputs
+	var songChoice, signature, tempo, interval, looping = getSettings(songList, inputSignature, inputTempo, loopButton); // get user inputs
 	reset(); // set up the slideshow
-	filterControlsPlaying(); // enable/disable correct inouts
+	filterControls(controls, [stopButton, muteButton], "off"); // enable/disable correct inouts
 	getChords(play); // make the ajax call and play slideshow
+}
+
+function stopAll(){
+	// clear all the timers and reset
+	var lastTimer = setTimeout(function(){}, 0);
+
+	for (var i=0; i < lastTimer; i++) { 
+	    clearTimeout(i);
+	}
+
+	filterControls(controls, [stopButton], "on");
+	reset();
 }
 
 // to reset: hide the progress bar and circles, start slideshow with blank images
@@ -175,7 +164,7 @@ function progress(sequence,onDeck){
 	}
 }
 
-function countdown(total){
+function countdown(total, interval, progressInd, sound){
 	// count the number of intervals elapsed
 	var num = 0
 
@@ -184,9 +173,10 @@ function countdown(total){
 		num += interval
 		const ratio = Math.round(num / total * 100);
 		if (ratio <= 100){
-			progressBar.style.flexBasis = `${ratio}%`
-			beep.currentTime = 0;
-			beep.play();
+			// change the size of the progress indicator and play sound
+			progressInd.style.flexBasis = `${ratio}%`
+			sound.currentTime = 0;
+			sound.play();
 		} else {
 			// at the end of this chord's duration, stop
 			clearInterval(update)}
@@ -202,8 +192,8 @@ function play(sequence){
 	progress(sequence,0);
 
 	// immediately show the circles to count down
-	duration = 0
-	setTimeout(clickCircles,duration)
+	duration = 0;
+	setTimeout(function(){clickCircles(interval, signature, circles, countin, progressBox, beep)}, duration);
 
 	// add one bar delay for count in
 	duration += (signature*interval) 
@@ -220,15 +210,15 @@ function play(sequence){
 
 }
 
-function clickCircles(){
+function clickCircles(interval, signature, svgs, thisDiv, nextDiv, sound){
 	// circle animation counts in for one bar
 
 	// unhide the correct number of circles
 	for (i=0; i<signature; i++){
-		circles[i].style.display = "block"
+		svgs[i].style.display = "block"
 	}
 	// unhide the div
-	countin.style.display = "flex"
+	thisDiv.style.display = "flex"
 
 	// count the number of intervals elapsed
 	var num = 0
@@ -236,14 +226,14 @@ function clickCircles(){
 	// update the circles and emit sound
 	function fillCircles(){
 		if (num < signature){
-			circles[num].style.fill = `var(--secondary)`
-			beep.currentTime = 0;
-			beep.play();
+			svgs[num].style.fill = `var(--secondary)`
+			sound.currentTime = 0;
+			sound.play();
 		} else {
 			// at the end of this chord's duration, stop
 			clearInterval(update)
-			countin.style.display = "none"
-			progressBox.style.display = "flex"}
+			thisDiv.style.display = "none"
+			nextDiv.style.display = "flex"}
 		num += 1
 		}
 		
@@ -257,7 +247,7 @@ function fullSlideshow(sequence){
 	setTimeout(function(){
 		progressFull.style.background = "var(--main)";
 		progress(sequence,1);
-		countdown(sequence.chords[0].bars*(signature*interval));
+		countdown(sequence.chords[0].bars*(signature*interval), interval, progressBar, beep);
 		},
 		duration)
 
@@ -268,7 +258,7 @@ function fullSlideshow(sequence){
 		duration += slide.bars*(signature*interval);
 		setTimeout(function(){
 			progress(sequence,count+2);
-			countdown(sequence.chords[count+1].bars*(signature*interval));
+			countdown(sequence.chords[count+1].bars*(signature*interval),interval, progressBar, beep);
 			},duration)
 		})(i);
 	}
@@ -291,7 +281,7 @@ function endSong(sequence){
 	duration += sequence.chords[Object.keys(sequence.chords).length-1].bars*(signature*interval);
 	// schedule reset 
 	setTimeout(function(){
-		filterControlsStopped();
+		filterControls(controls, [stopButton], "on");
 		reset();
 	},duration)}
 
