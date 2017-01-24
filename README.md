@@ -1,1 +1,19 @@
 # slider
+
+## summary
+
+timed slideshow plays through chord changes for a library of songs. current implementation displays ukulele chord tabs.
+
+## instructions
+
+download all files and run index.html in browser.
+
+files:
+* index.html
+* slider.js
+* sliderstyle.css
+* audio folder: contains mp3 file for metronome click
+* images folder: contains svg images for control buttons. tabs subfolder contains jpeg images of ukulele chord tabs.
+* library folder: contains JSON files, each representing a song with chord progression and duration (# measures) for each chord
+
+compatibility: tested for Chrome (v55)

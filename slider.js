@@ -3,7 +3,7 @@ const controls = document.querySelectorAll("button, input,select")
 
 // get library button and settings
 const libraryButton = document.getElementById("library")
-libraryButton.addEventListener("click",libraryMode)
+libraryButton.addEventListener("click",filterControlsLibrary)
 const libraryList = document.getElementById("library_list")
 const songList = document.getElementById("song")
 const pickSong = document.getElementById("pick_song")
@@ -53,33 +53,6 @@ var signature, tempo, interval = updateTime();
 circles = document.querySelectorAll("circle");
 countin = document.getElementById("countin");
 
-// in library mode, allow song change
-function libraryMode(){
-	controls.forEach(function(control){
-		if (! [libraryButton, songList, pickSong].includes(control)) {
-			control.disabled = true;
-		}
-	})
-
-	// show the select list of songs and listen for "select" button
-	libraryList.style.display = "flex"
-
-	pickSong.addEventListener("click",selectSong)
-
-	// upon hitting select, exit (back to main view) and update the song label
-	function selectSong(){
-		
-		controls.forEach(function(control){
-			control.disabled = false;
-		})
-		
-		libraryList.style.display = "none"
-
-		songLabel.innerHTML = songList[songList.selectedIndex].text
-	}
-}
-
-
 // enable/disable controls corresponding to "playing" mode
 function filterControlsPlaying(){
 	controls.forEach(function(control){
@@ -96,6 +69,27 @@ function filterControlsStopped(){
 		control.disabled = false;
 		})
 	stopButton.disabled = true;
+}
+
+function filterControlsLibrary(){
+	controls.forEach(function(control){
+		if (! [libraryButton, songList, pickSong].includes(control)) {
+			control.disabled = true;
+		}
+	})
+	// show the list of songs and listen for "select" button
+	libraryList.style.display = "flex"
+	pickSong.addEventListener("click",selectSong)
+}
+
+function selectSong(){
+	// exit (back to main view) 
+	controls.forEach(function(control){
+		control.disabled = false;
+	})
+	// update the song label
+	libraryList.style.display = "none"
+	songLabel.innerHTML = songList[songList.selectedIndex].text
 }
 
 function stopAll(){
@@ -135,7 +129,23 @@ function muteUnmute(){
 	}
 }
 
-// to reset: enable controls, hide the progress bar and circles, start slideshow with blank images
+// after hitting start, disable controls, get chords from the JSON file, and play
+function start(){
+	updateTime(); // get any new time inputs
+	reset(); // set up the slideshow
+	filterControlsPlaying(); // enable/disable correct inouts
+	getChords(play); // make the ajax call and play slideshow
+}
+
+// update time signature and tempo to match current inputs
+function updateTime(){
+	signature = inputSignature.value; // beats per measure
+	tempo = inputTempo.value; // bpm
+	interval = 60*1000/tempo; // time interval to play each beat
+	return signature, tempo, interval
+}
+
+// to reset: hide the progress bar and circles, start slideshow with blank images
 function reset(){
 	progressBox.style.display = "none"
 	progressFull.style.background = "none";
@@ -146,14 +156,6 @@ function reset(){
 	secondImg.src = blankPath;
 	thirdImg.src = blankPath;
 	}
-
-// update time signature and tempo to match current inputs
-function updateTime(){
-	signature = inputSignature.value; // beats per measure
-	tempo = inputTempo.value; // bpm
-	interval = 60*1000/tempo; // time interval to play each beat
-	return signature, tempo, interval
-}
 
 function progress(sequence,onDeck){
 	// if there are slides remaining, add the next one on deck
@@ -294,13 +296,6 @@ function endSong(sequence){
 		reset();
 	},duration)}
 
-// after hitting start, disable controls, get chords from the JSON file, and play
-function start(){
-	updateTime(); // get any new time inputs
-	reset(); // set up the slideshow
-	filterControlsPlaying(); // enable/disable correct inouts
-	getChords(play); // make the ajax call and play slideshow
-}
 
 // get the JSON file corresponding to the song selected
 function getChords(callback){
