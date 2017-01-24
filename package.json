@@ -1,0 +1,28 @@
+{
+  "name": "slider",
+  "version": "1.0.0",
+  "description": "",
+  "main": "slider.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "chai": "^3.5.0"
+  },
+  "devDependencies": {
+    "mocha": "^3.2.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/trinaleigh/slider.git"
+  },
+  "author": "",
+  "license": "",
+  "bugs": {
+    "url": "https://github.com/trinaleigh/slider/issues"
+  },
+  "homepage": "https://github.com/trinaleigh/slider#readme"
+}

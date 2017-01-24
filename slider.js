@@ -19,17 +19,20 @@ const stopButton = document.getElementById("stop")
 stopButton.addEventListener("click",stopAll)
 
 // get looping button
-var looping = false;
 const loopButton = document.getElementById("loop")
-loopButton.addEventListener("click",toggleLoop)
 const loopLabel = document.getElementById("loop_label")
-
-// get mute button
-const muteButton = document.getElementById("mute")
-muteButton.addEventListener("click",muteUnmute)
+loopButton.addEventListener("click",function(){toggleLoop(this, loopLabel)})
 
 // get beep
 const beep = new Audio('audio/beep.mp3');
+
+// get mute button
+const muteButton = document.getElementById("mute")
+muteButton.addEventListener("click",function(){muteUnmute(this, beep)})
+
+// get time and tempo inputs
+const inputSignature = document.getElementById("time_signature")
+const inputTempo = document.getElementById("tempo")
 
 // get 3 slide positions
 const firstImg = document.getElementById("first")
@@ -44,14 +47,20 @@ const progressBar = document.querySelector(".progress_current")
 // use blank image for begging / end of sequence
 const blankPath = "images/blank.jpeg"
 
-// get time and tempo inputs
-const inputSignature = document.getElementById("time_signature")
-const inputTempo = document.getElementById("tempo")
-var signature, tempo, interval = updateTime();
-
 // get circles used to count into the song
-circles = document.querySelectorAll("circle");
-countin = document.getElementById("countin");
+const circles = document.querySelectorAll("circle");
+const countin = document.getElementById("countin");
+
+// update time signature and tempo to match current inputs
+function getSettings(){
+	currentSong = songList.value; // song selected
+	signature = inputSignature.value; // beats per measure
+	tempo = inputTempo.value; // bpm
+	interval = 60*1000/tempo; // time interval to play each beat
+	looping = loopButton.classList.contains("looping") // true or false
+
+	return currentSong, signature, tempo, interval, looping;
+}
 
 // enable/disable controls corresponding to "playing" mode
 function filterControlsPlaying(){
@@ -104,45 +113,35 @@ function stopAll(){
 	reset();
 }
 
-function toggleLoop(){
-	// turn looping on/off
-	looping = !looping
+function toggleLoop(btn, lbl){
 	// change the button display
-	if (looping) {
-		loopButton.classList.add("looping");
-		loopLabel.innerHTML = "Loop";
+	if (! btn.classList.contains("looping")) {
+		btn.classList.add("looping");
+		lbl.innerHTML = "Loop";
 	} else {
-		loopButton.classList.remove("looping");
-		loopLabel.innerHTML = "1x";
+		btn.classList.remove("looping");
+		lbl.innerHTML = "1x";
 	}
 }
 
 // mute/unmute audio when button toggled
-function muteUnmute(){
+function muteUnmute(btn, sound){
 	// mute/unmute audio file
-	beep.muted = !beep.muted;
+	sound.muted = !sound.muted;
 	// change the button display
-	if (beep.muted) {
-		muteButton.classList.add("muted");
+	if (sound.muted) {
+		btn.classList.add("muted");
 	} else {
-		muteButton.classList.remove("muted");
+		btn.classList.remove("muted");
 	}
 }
 
 // after hitting start, disable controls, get chords from the JSON file, and play
 function start(){
-	updateTime(); // get any new time inputs
+	var songChoice, signature, tempo, interval, looping = getSettings(); // get user inputs
 	reset(); // set up the slideshow
 	filterControlsPlaying(); // enable/disable correct inouts
 	getChords(play); // make the ajax call and play slideshow
-}
-
-// update time signature and tempo to match current inputs
-function updateTime(){
-	signature = inputSignature.value; // beats per measure
-	tempo = inputTempo.value; // bpm
-	interval = 60*1000/tempo; // time interval to play each beat
-	return signature, tempo, interval
 }
 
 // to reset: hide the progress bar and circles, start slideshow with blank images
@@ -300,7 +299,7 @@ function endSong(sequence){
 // get the JSON file corresponding to the song selected
 function getChords(callback){
 	$.ajax({
-	    url: `library/${songList.value}.json`,
+	    url: `library/${currentSong}.json`,
 	    success: function (data) {
 	        callback(data);
 	    }
