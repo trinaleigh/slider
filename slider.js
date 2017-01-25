@@ -89,7 +89,7 @@ function openLibrary(allControls, exceptions, modeDiv, submitter, modeLabel, mod
 
 function exitMode(allControls, modeDiv, modeLabel, modeList){
 	// exit (back to main view) 
-	filterControls(controls, [], "on")
+	filterControls(allControls, [], "on")
 	// update song label to the selection
 	modeDiv.style.display = "none"
 	modeLabel.innerHTML = modeList[modeList.selectedIndex].text
