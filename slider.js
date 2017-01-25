@@ -53,6 +53,7 @@ const countin = document.getElementById("countin");
 
 // update time signature and tempo to match current inputs
 function getSettings(songControl, signatureControl, tempoControl, loopingControl){
+
 	var currentSong = songControl.value; // song selected
 	var signature = signatureControl.value; // beats per measure
 	var tempo = tempoControl.value; // bpm
@@ -118,17 +119,29 @@ function muteUnmute(btn, sound){
 	}
 }
 
+// enforce min and max on number input
+function enforceMinMax(input) {
+	if(parseInt(input.value) > parseInt(input.max) || parseInt(input.value) < parseInt(input.min) || input.value == "") {
+		alert(`Value for ${input.id} must be between ${input.min} and ${input.max}.`)
+		return false;
+	} else {
+		return true;
+	}}
+
 // after hitting start, disable controls, get chords from the JSON file, and play
 function start(){
-	var currentState = getSettings(songList, inputSignature, inputTempo, loopButton); // get user inputs
-	var currentSong = currentState.currentSong;
-	var currentSignature = currentState.signature;
-	var currentInterval = currentState.interval;
-	var isLooping = currentState.looping;
-	// songChoice, signatureSet, tempoSet, intervalSet, looping
-	reset(); // set up the slideshow
-	filterControls(controls, [stopButton, muteButton], "off"); // disable inputs except stop and mute
-	getChords(currentSong, currentSignature, currentInterval, isLooping, play); // make the ajax call and play slideshow
+
+	if (enforceMinMax(inputTempo)) {	
+		var currentState = getSettings(songList, inputSignature, inputTempo, loopButton); // get user inputs
+		var currentSong = currentState.currentSong;
+		var currentSignature = currentState.signature;
+		var currentInterval = currentState.interval;
+		var isLooping = currentState.looping;
+		// songChoice, signatureSet, tempoSet, intervalSet, looping
+		reset(); // set up the slideshow
+		filterControls(controls, [stopButton, muteButton], "off"); // disable inputs except stop and mute
+		getChords(currentSong, currentSignature, currentInterval, isLooping, play); // make the ajax call and play slideshow
+	}
 }
 
 function stopAll(){
