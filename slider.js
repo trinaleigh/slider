@@ -1,5 +1,6 @@
 // get all user controls to easily enable/disable
 const controls = document.querySelectorAll("button, input,select");
+const toolbar = document.getElementById("toolbar");
 
 // get library button and settings
 const libraryButton = document.getElementById("library");
@@ -121,9 +122,17 @@ function muteUnmute(button, sound){
 }
 
 // enforce min and max on number input
-function enforceMinMax(input) {
+function enforceMinMax(input, disabledAction, referenceDiv) {
 	if(parseInt(input.value) > parseInt(input.max) || parseInt(input.value) < parseInt(input.min) || input.value == "") {
-		alert(`Value for ${input.id} must be between ${input.min} and ${input.max}.`)
+		warning = document.createElement("h2")
+		warning.style.float = "right";
+		warning.innerHTML = `⚠️ Value for ${input.id} must be between ${input.min} and ${input.max}.`
+		document.body.insertBefore(warning, referenceDiv.nextSibling)
+		disabledAction.disabled = true;
+		setTimeout(function(){
+			disabledAction.disabled = false;
+			warning.remove();
+		},2000)
 		return false;
 	} else {
 		return true;
@@ -132,7 +141,7 @@ function enforceMinMax(input) {
 // after hitting start, disable controls, get chords from the JSON file, and play
 function start(){
 	// check that inputs are valid before proceeding
-	if (enforceMinMax(inputTempo)) {	
+	if (enforceMinMax(inputTempo, startButton, toolbar)) {	
 		//store the state variables
 		var currentState = getSettings(songList, inputSignature, inputTempo, loopButton); // get user inputs
 		var currentSong = currentState.currentSong;
@@ -154,12 +163,12 @@ function stopAll(){
 	    clearTimeout(i);
 	}
 
-	filterControls(controls, [stopButton], "on");
 	reset();
 }
 
 // to reset: hide the progress bar and circles, start slideshow with blank images
 function reset(){
+	filterControls(controls, [stopButton], "on");
 	progressBox.style.display = "none";
 	progressBar.style.flexBasis = "0%";
 	circles.forEach(circle => circle.style.fill = `none`);
@@ -309,7 +318,6 @@ function endSong(sequence, signature, interval, duration){
 	duration += sequence.chords[Object.keys(sequence.chords).length-1].bars*(signature*interval);
 	// schedule reset 
 	setTimeout(function(){
-		filterControls(controls, [stopButton], "on");
 		reset();
 	},duration)}
 

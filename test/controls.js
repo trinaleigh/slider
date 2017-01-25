@@ -217,7 +217,9 @@ describe('Enforce input min/max', function (){
 		testNumber.min = 50;
 		testNumber.value = 20;
 
-		result = enforceMinMax(testNumber);
+		testDiv = document.createElement("div");
+
+		result = enforceMinMax(testNumber, testDiv);
 
 		assert.equal(result, false)
 
@@ -230,18 +232,18 @@ describe('Enforce input min/max', function (){
 		testNumber.min = 50;
 		testNumber.value = 200;
 
-		result = enforceMinMax(testNumber);
+		result = enforceMinMax(testNumber, testDiv);
 
 		assert.equal(result, false)
 	})
 
 	it('refuses null value', function(){
-				var testNumber = document.createElement("input")
+		var testNumber = document.createElement("input")
 		testNumber.setAttribute("type", "number");
 		testNumber.max = 100;
 		testNumber.min = 50;
 
-		result = enforceMinMax(testNumber);
+		result = enforceMinMax(testNumber, testDiv);
 
 		assert.equal(result, false)
 	})
@@ -253,7 +255,7 @@ describe('Enforce input min/max', function (){
 		testNumber.min = 50;
 		testNumber.value = 75;
 
-		result = enforceMinMax(testNumber);
+		result = enforceMinMax(testNumber, testDiv);
 
 		assert.equal(result, true)
 	})
