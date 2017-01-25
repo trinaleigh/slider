@@ -3,7 +3,6 @@ const controls = document.querySelectorAll("button, input,select");
 
 // get library button and settings
 const libraryButton = document.getElementById("library");
-libraryButton.addEventListener("click", function() {openLibrary(controls, [libraryButton, songList, pickSong], libraryList, pickSong, songLabel, songList)});
 const libraryList = document.getElementById("library_list");
 const songList = document.getElementById("song");
 const pickSong = document.getElementById("pick_song");
@@ -12,23 +11,19 @@ songLabel.innerHTML = songList[songList.selectedIndex].text;
 
 // get start button
 const startButton = document.getElementById("start");
-startButton.addEventListener("click",start);
 
 // get stop button
 const stopButton = document.getElementById("stop");
-stopButton.addEventListener("click",stopAll);
 
 // get looping button
 const loopButton = document.getElementById("loop");
 const loopLabel = document.getElementById("loop_label");
-loopButton.addEventListener("click",function(){toggleLoop(this, loopLabel)});
 
 // get beep
 const beep = new Audio('audio/beep.mp3');
 
 // get mute button
 const muteButton = document.getElementById("mute");
-muteButton.addEventListener("click",function(){muteUnmute(this, beep)});
 
 // get time and tempo inputs
 const inputSignature = document.getElementById("time_signature");
@@ -41,7 +36,6 @@ const thirdImg = document.getElementById("third");
 
 // get progress bar
 const progressBox = document.querySelector(".progress");
-const progressFull = document.querySelector(".progress_full");
 const progressBar = document.querySelector(".progress_current");
 
 // use blank image for begging / end of sequence
@@ -50,6 +44,13 @@ const blankPath = "images/blank.jpeg";
 // get circles used to count into the song
 const circles = document.querySelectorAll("circle");
 const countin = document.getElementById("countin");
+
+// listeners
+libraryButton.addEventListener("click", function() {openMode(controls, [libraryButton, songList, pickSong], libraryList, pickSong, songLabel, songList)});
+startButton.addEventListener("click",start);
+stopButton.addEventListener("click",stopAll);
+loopButton.addEventListener("click",function(){toggleLoop(this, loopLabel)});
+muteButton.addEventListener("click",function(){muteUnmute(this, beep)});
 
 // update time signature and tempo to match current inputs
 function getSettings(songControl, signatureControl, tempoControl, loopingControl){
@@ -80,7 +81,7 @@ function filterControls(allControls, exceptions, direction){
 	})
 }
 
-function openLibrary(allControls, exceptions, modeDiv, submitter, modeLabel, modeList){
+function openMode(allControls, exceptions, modeDiv, submitter, modeLabel, modeList){
 	// enable library controls only
 	filterControls(allControls, exceptions, "off")
 	// show the list of songs and listen for "select" button
@@ -96,26 +97,26 @@ function exitMode(allControls, modeDiv, modeLabel, modeList){
 	modeLabel.innerHTML = modeList[modeList.selectedIndex].text
 }
 
-function toggleLoop(btn, lbl){
+function toggleLoop(button, label){
 	// change the button display
-	if (! btn.classList.contains("looping")) {
-		btn.classList.add("looping");
-		lbl.innerHTML = "Loop";
+	if (! button.classList.contains("looping")) {
+		button.classList.add("looping");
+		label.innerHTML = "Loop";
 	} else {
-		btn.classList.remove("looping");
-		lbl.innerHTML = "1x";
+		button.classList.remove("looping");
+		label.innerHTML = "1x";
 	}
 }
 
 // mute/unmute audio when button toggled
-function muteUnmute(btn, sound){
+function muteUnmute(button, sound){
 	// mute/unmute audio file
 	sound.muted = !sound.muted;
 	// change the button display
 	if (sound.muted) {
-		btn.classList.add("muted");
+		button.classList.add("muted");
 	} else {
-		btn.classList.remove("muted");
+		button.classList.remove("muted");
 	}
 }
 
@@ -130,16 +131,17 @@ function enforceMinMax(input) {
 
 // after hitting start, disable controls, get chords from the JSON file, and play
 function start(){
-
+	// check that inputs are valid before proceeding
 	if (enforceMinMax(inputTempo)) {	
+		//store the state variables
 		var currentState = getSettings(songList, inputSignature, inputTempo, loopButton); // get user inputs
 		var currentSong = currentState.currentSong;
 		var currentSignature = currentState.signature;
 		var currentInterval = currentState.interval;
 		var isLooping = currentState.looping;
-		// songChoice, signatureSet, tempoSet, intervalSet, looping
-		reset(); // set up the slideshow
+		// disable controls (except for stop, mute) while playing
 		filterControls(controls, [stopButton, muteButton], "off"); // disable inputs except stop and mute
+		// kick off the slideshow
 		getChords(currentSong, currentSignature, currentInterval, isLooping, play); // make the ajax call and play slideshow
 	}
 }
@@ -158,11 +160,10 @@ function stopAll(){
 
 // to reset: hide the progress bar and circles, start slideshow with blank images
 function reset(){
-	progressBox.style.display = "none"
-	progressFull.style.background = "none";
+	progressBox.style.display = "none";
 	progressBar.style.flexBasis = "0%";
-	circles.forEach(circle => circle.style.fill = `none`)
-	circles.forEach(circle => circle.style.display = `none`)
+	circles.forEach(circle => circle.style.fill = `none`);
+	circles.forEach(circle => circle.style.display = `none`);
 	firstImg.src = blankPath;
 	secondImg.src = blankPath;
 	thirdImg.src = blankPath;
@@ -270,7 +271,6 @@ function fullSlideshow(sequence, signature, interval, looping, duration){
 	showTime = duration
 
 	setTimeout(function(){
-		progressFull.style.background = "var(--main)";
 		progress(sequence, 1, looping);
 		countdown(sequence.chords[0].bars*(signature*interval), interval, progressBar, beep);
 		},

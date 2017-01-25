@@ -190,7 +190,7 @@ div {
   display:flex;
   flex-basis:100%;
   height:20px;
-  background: none;
+  background: var(--main);
   justify-content: flex-start;
 }
 
