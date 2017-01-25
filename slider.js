@@ -53,13 +53,18 @@ const countin = document.getElementById("countin");
 
 // update time signature and tempo to match current inputs
 function getSettings(songControl, signatureControl, tempoControl, loopingControl){
-	currentSong = songControl.value; // song selected
-	signature = signatureControl.value; // beats per measure
-	tempo = tempoControl.value; // bpm
-	interval = 60*1000/tempo; // time interval to play each beat
-	looping = loopingControl.classList.contains("looping") // true or false
+	var currentSong = songControl.value; // song selected
+	var signature = signatureControl.value; // beats per measure
+	var tempo = tempoControl.value; // bpm
+	var interval = 60*1000/tempo; // time interval to play each beat
+	var looping = loopingControl.classList.contains("looping") // true or false
 
-	return currentSong, signature, tempo, interval, looping;
+	state = {currentSong, 
+			signature, 
+			interval, 
+			looping};
+
+	return state;
 }
 
 function filterControls(allControls, exceptions, direction){
@@ -115,10 +120,15 @@ function muteUnmute(btn, sound){
 
 // after hitting start, disable controls, get chords from the JSON file, and play
 function start(){
-	var songChoice, signature, tempo, interval, looping = getSettings(songList, inputSignature, inputTempo, loopButton); // get user inputs
+	var currentState = getSettings(songList, inputSignature, inputTempo, loopButton); // get user inputs
+	var currentSong = currentState.currentSong;
+	var currentSignature = currentState.signature;
+	var currentInterval = currentState.interval;
+	var isLooping = currentState.looping;
+	// songChoice, signatureSet, tempoSet, intervalSet, looping
 	reset(); // set up the slideshow
-	filterControls(controls, [stopButton, muteButton], "off"); // enable/disable correct inouts
-	getChords(play); // make the ajax call and play slideshow
+	filterControls(controls, [stopButton, muteButton], "off"); // disable inputs except stop and mute
+	getChords(currentSong, currentSignature, currentInterval, isLooping, play); // make the ajax call and play slideshow
 }
 
 function stopAll(){
@@ -145,7 +155,7 @@ function reset(){
 	thirdImg.src = blankPath;
 	}
 
-function progress(sequence,onDeck){
+function progress(sequence,onDeck,looping){
 	// if there are slides remaining, add the next one on deck
 	if (onDeck < Object.keys(sequence.chords).length){
 		firstImg.src = secondImg.src
@@ -178,7 +188,7 @@ function countdown(total, interval, progressInd, sound){
 			sound.currentTime = 0;
 			sound.play();
 		} else {
-			// at the end of this chord's duration, stop
+			// at the end of this chord's bars, stop
 			clearInterval(update)}
 		}
 
@@ -187,25 +197,25 @@ function countdown(total, interval, progressInd, sound){
 	var update = setInterval(showprogress,interval)
 }
 
-function play(sequence){
+function play(sequence, signature, interval, looping){
 	// setup: progress once and show empty circles
-	progress(sequence,0);
+	progress(sequence, 0, looping);
 
 	// immediately show the circles to count down
-	duration = 0;
-	setTimeout(function(){clickCircles(interval, signature, circles, countin, progressBox, beep)}, duration);
+	var preShow = 0;
+	setTimeout(function(){clickCircles(interval, signature, circles, countin, progressBox, beep)}, preShow);
 
 	// add one bar delay for count in
-	duration += (signature*interval) 
+	preShow += (signature*interval) 
 
 	// play the slideshow once through
-	fullSlideshow(sequence,0)
+	afterShow = fullSlideshow(sequence, signature, interval, looping, preShow)
 
 	// loop or end
 	if (looping == true){
-		loop(sequence);
+		loop(sequence, signature, interval, afterShow);
 	} else {
-		endSong(sequence);
+		endSong(sequence, signature, interval, afterShow);
 	}
 
 }
@@ -242,40 +252,45 @@ function clickCircles(interval, signature, svgs, thisDiv, nextDiv, sound){
 
 }
 
-function fullSlideshow(sequence){
+function fullSlideshow(sequence, signature, interval, looping, duration){
 	// schedule the first slide transition
+	showTime = duration
+
 	setTimeout(function(){
 		progressFull.style.background = "var(--main)";
-		progress(sequence,1);
+		progress(sequence, 1, looping);
 		countdown(sequence.chords[0].bars*(signature*interval), interval, progressBar, beep);
 		},
-		duration)
+		showTime)
 
 	// schedule each subsequent slide transition
 	for (i=0; i<Object.keys(sequence.chords).length-1; i++) {
 		(function(count){
 		slide = sequence.chords[count];
-		duration += slide.bars*(signature*interval);
+		showTime += slide.bars*(signature*interval);
 		setTimeout(function(){
-			progress(sequence,count+2);
-			countdown(sequence.chords[count+1].bars*(signature*interval),interval, progressBar, beep);
-			},duration)
+			progress(sequence, count+2, looping);
+			countdown(sequence.chords[count+1].bars*(signature*interval), interval, progressBar, beep);
+			},showTime)
 		})(i);
 	}
+
+	return showTime;
 }
 
-function loop(sequence){
+function loop(sequence, signature, interval, duration){
 	// replays the full slideshow up to 20x
+	afterShow = duration
 	for (loopNum=1; loopNum<20; loopNum++){
 		// add time for the last chord
-		duration += sequence.chords[Object.keys(sequence.chords).length-1].bars*(signature*interval);
+		afterShow += sequence.chords[Object.keys(sequence.chords).length-1].bars*(signature*interval);
 		// play again up to 20x
-		fullSlideshow(sequence);
+		afterShow = fullSlideshow(sequence, signature, interval, true, afterShow);
 	}
-	endSong(sequence)
+	endSong(sequence, signature, interval, afterShow)
 } 
 
-function endSong(sequence){	
+function endSong(sequence, signature, interval, duration){	
 	// clears off the page after the last chord
 	// add time for the last chord
 	duration += sequence.chords[Object.keys(sequence.chords).length-1].bars*(signature*interval);
@@ -287,11 +302,11 @@ function endSong(sequence){
 
 
 // get the JSON file corresponding to the song selected
-function getChords(callback){
+function getChords(currentSong, signature, interval, looping, callback){
 	$.ajax({
 	    url: `library/${currentSong}.json`,
 	    success: function (data) {
-	        callback(data);
+	        callback(data, signature, interval, looping);
 	    }
 	});
 }
