@@ -61,7 +61,7 @@ startButton.addEventListener("click",function(){
 });
 stopButton.addEventListener("click",function(){
 	stopAll();
-	reset();
+	reset(controls, [stopButton], [progressBox], images, blankPath);
 });
 
 
@@ -72,7 +72,7 @@ function getSettings(songControl, signatureControl, tempoControl, loopingControl
 			signature: signatureControl.value, // beats per measure
 			interval: 60*1000/tempoControl.value, // time interval to play each beat
 			looping: loopingControl.classList.contains("looping") // true or false
-		};
+			};
 
 	return state;
 }
@@ -146,21 +146,20 @@ function enforceMinMax(input, disabledAction, referenceDiv) {
 	}}
 
 function stopAll(){
-	// clear all the timers and reset
+	// clear all existing timers
 	var lastTimer = setTimeout(function(){}, 0);
-
 	for (var i=0; i < lastTimer; i++) { 
 	    clearTimeout(i);
 	}
-
 }
 
-// to reset: hide the progress bar and circles, start slideshow with blank images
-function reset(){
-	filterControls(controls, [stopButton], "on");
-	progressBox.style.display = "none";
-	progressBar.style.flexBasis = "0%";
-	images.forEach(image => image.src = blankPath);
+function reset(allControls, exceptions, divs, images, filepath){
+	// enable all controls minus exceptions
+	filterControls(allControls, exceptions, "on");
+	// hide divs
+	divs.forEach(div =>  div.style.display = "none");
+	// reset images to given file
+	images.forEach(image => image.src = filepath);
 	}
 
 function progress(sequence,onDeck,looping){
@@ -302,7 +301,7 @@ function endSong(sequence, signature, interval, duration){
 	duration += sequence.chords[Object.keys(sequence.chords).length-1].bars*(signature*interval);
 	// schedule reset 
 	setTimeout(function(){
-		reset();
+		reset(controls, [stopButton], [progressBox], images, blankPath);
 	},duration)}
 
 

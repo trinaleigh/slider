@@ -240,7 +240,8 @@ describe('Enforce input min/max', function (){
 		testDiv = document.createElement("div");
 		nextDiv = document.createElement("div");
 
-		result = enforceMinMax(testNumber, testButton, testDiv);
+		setTimeout(function(){
+			var result = enforceMinMax(testNumber, testButton, testDiv)},3000);
 
 		assert.equal(result, false)
 	})
@@ -253,13 +254,14 @@ describe('Enforce input min/max', function (){
 
 		var testButton = document.createElement("button"); 
 
-		testDiv = document.createElement("div");
-		nextDiv = document.createElement("div");
+		var testDiv = document.createElement("div");
+		var varnextDiv = document.createElement("div");
 
-		result = enforceMinMax(testNumber, testButton, testDiv);
+		setTimeout(function(){
+			var result = enforceMinMax(testNumber, testButton, testDiv)},6000);
 
 		assert.equal(result, false)
-	})
+	});
 
 	it('accepts value in range', function(){
 		var testNumber = document.createElement("input")
@@ -271,9 +273,82 @@ describe('Enforce input min/max', function (){
 		result = enforceMinMax(testNumber, testDiv);
 
 		assert.equal(result, true)
-	})
+	});
 
 })
 
+describe('Reset page', function(){
+	it('enables controls with exception', function(){
+		const blankPath = "images/blank.jpeg";
+
+		var testButton1 = document.createElement("button");
+		var testButton2 = document.createElement("button");
+		var testButton3 = document.createElement("button");
+		var controlList = [testButton1, testButton2, testButton3]
+
+		var testDiv = document.createElement("div");
+		var nextDiv = document.createElement("div");
+		var divList = [testDiv, nextDiv];
+
+		var img1 = document.createElement("img");
+		var img2 = document.createElement("img");
+		var img3 = document.createElement("img");
+		var imgList =[img1, img2, img3];
+
+		reset(controlList, [testButton2], divList, imgList, blankPath);
+
+		assert.equal(testButton1.disabled, false);
+		assert.equal(testButton2.disabled, true);
+		assert.equal(testButton3.disabled, false);
+	});
+
+	it('hides divs', function(){
+		const blankPath = "images/blank.jpeg";
+
+		var testButton1 = document.createElement("button");
+		var testButton2 = document.createElement("button");
+		var testButton3 = document.createElement("button");
+		var controlList = [testButton1, testButton2, testButton3]
+
+		var testDiv = document.createElement("div");
+		var nextDiv = document.createElement("div");
+		var divList = [testDiv, nextDiv];
+
+		var img1 = document.createElement("img");
+		var img2 = document.createElement("img");
+		var img3 = document.createElement("img");
+		var imgList =[img1, img2, img3];
+
+		reset(controlList, [testButton2], divList, imgList, blankPath);
+
+		assert.equal(testDiv.style.display, "none");
+		assert.equal(nextDiv.style.display, "none");
+	});
+
+	it('replaces images with blanks', function(){
+		const blankPath = "images/blank.jpeg";
+
+		var testButton1 = document.createElement("button");
+		var testButton2 = document.createElement("button");
+		var testButton3 = document.createElement("button");
+		var controlList = [testButton1, testButton2, testButton3]
+
+		var testDiv = document.createElement("div");
+		var nextDiv = document.createElement("div");
+		var divList = [testDiv, nextDiv];
+
+		var img1 = document.createElement("img");
+		var img2 = document.createElement("img");
+		var img3 = document.createElement("img");
+		var imgList =[img1, img2, img3];
+
+		reset(controlList, [testButton2], divList, imgList, blankPath);
+
+		assert.include(img1.src, "images/blank.jpeg");
+		assert.include(img2.src, "images/blank.jpeg");
+		assert.include(img3.src, "images/blank.jpeg");
+
+	});
+})
 
 
