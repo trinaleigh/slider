@@ -5,7 +5,7 @@ const toolbar = document.getElementById("toolbar");
 // get library button and settings
 const libraryButton = document.getElementById("library");
 const libraryList = document.getElementById("library_list");
-const songList = document.getElementById("song");
+const songList = document.getElementById("song_list");
 const pickSong = document.getElementById("pick_song");
 const songLabel = document.getElementById("current_song");
 songLabel.innerHTML = songList[songList.selectedIndex].text;
@@ -56,7 +56,7 @@ startButton.addEventListener("click",function(){
 		// disable controls (except for stop, mute) while playing
 		filterControls(controls, [stopButton, muteButton], "off");
 		// kick off the slideshow
-		getChords(currentState.currentSong, currentState.signature, currentState.interval, currentState.looping, play);
+		getChords(currentState.song, currentState.signature, currentState.interval, currentState.looping, play);
 	}
 });
 stopButton.addEventListener("click",function(){
@@ -68,16 +68,11 @@ stopButton.addEventListener("click",function(){
 // update time signature and tempo to match current inputs
 function getSettings(songControl, signatureControl, tempoControl, loopingControl){
 
-	var currentSong = songControl.value; // song selected
-	var signature = signatureControl.value; // beats per measure
-	var tempo = tempoControl.value; // bpm
-	var interval = 60*1000/tempo; // time interval to play each beat
-	var looping = loopingControl.classList.contains("looping") // true or false
-
-	state = {currentSong, 
-			signature, 
-			interval, 
-			looping};
+	state = {song: songControl.value, // song selected
+			signature: signatureControl.value, // beats per measure
+			interval: 60*1000/tempoControl.value, // time interval to play each beat
+			looping: loopingControl.classList.contains("looping") // true or false
+		};
 
 	return state;
 }
@@ -312,9 +307,9 @@ function endSong(sequence, signature, interval, duration){
 
 
 // get the JSON file corresponding to the song selected
-function getChords(currentSong, signature, interval, looping, callback){
+function getChords(song, signature, interval, looping, callback){
 	$.ajax({
-	    url: `library/${currentSong}.json`,
+	    url: `library/${song}.json`,
 	    success: function (data) {
 	        callback(data, signature, interval, looping);
 	    }

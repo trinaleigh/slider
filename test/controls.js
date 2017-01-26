@@ -23,7 +23,7 @@ describe('Get settings', function(){
 
 		testState = getSettings(testSelect, testSignature, testNumber, testButton1)
 
-		assert.equal(testState.currentSong, "Kiwi");
+		assert.equal(testState.song, "Kiwi");
 		assert.equal(testState.signature, "1");
 		assert.equal(testState.interval, 600);
 		assert.equal(testState.looping, false);
@@ -217,9 +217,12 @@ describe('Enforce input min/max', function (){
 		testNumber.min = 50;
 		testNumber.value = 20;
 
-		testDiv = document.createElement("div");
+		var testButton = document.createElement("button"); 
 
-		result = enforceMinMax(testNumber, testDiv);
+		testDiv = document.createElement("div");
+		nextDiv = document.createElement("div");
+
+		result = enforceMinMax(testNumber, testButton, testDiv);
 
 		assert.equal(result, false)
 
@@ -232,7 +235,12 @@ describe('Enforce input min/max', function (){
 		testNumber.min = 50;
 		testNumber.value = 200;
 
-		result = enforceMinMax(testNumber, testDiv);
+		var testButton = document.createElement("button"); 
+
+		testDiv = document.createElement("div");
+		nextDiv = document.createElement("div");
+
+		result = enforceMinMax(testNumber, testButton, testDiv);
 
 		assert.equal(result, false)
 	})
@@ -243,7 +251,12 @@ describe('Enforce input min/max', function (){
 		testNumber.max = 100;
 		testNumber.min = 50;
 
-		result = enforceMinMax(testNumber, testDiv);
+		var testButton = document.createElement("button"); 
+
+		testDiv = document.createElement("div");
+		nextDiv = document.createElement("div");
+
+		result = enforceMinMax(testNumber, testButton, testDiv);
 
 		assert.equal(result, false)
 	})
