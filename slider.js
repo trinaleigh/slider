@@ -31,9 +31,7 @@ const inputSignature = document.getElementById("time_signature");
 const inputTempo = document.getElementById("tempo");
 
 // get 3 slide positions
-const firstImg = document.getElementById("first");
-const secondImg = document.getElementById("second");
-const thirdImg = document.getElementById("third");
+const images = document.querySelectorAll("img");
 
 // get progress bar
 const progressBox = document.querySelector(".progress");
@@ -48,10 +46,24 @@ const countin = document.getElementById("countin");
 
 // listeners
 libraryButton.addEventListener("click", function() {openMode(controls, [libraryButton, songList, pickSong], libraryList, pickSong, songLabel, songList)});
-startButton.addEventListener("click",start);
-stopButton.addEventListener("click",stopAll);
 loopButton.addEventListener("click",function(){toggleLoop(this, loopLabel)});
 muteButton.addEventListener("click",function(){muteUnmute(this, beep)});
+startButton.addEventListener("click",function(){
+	// check that inputs are valid before proceeding
+	if (enforceMinMax(inputTempo, startButton, toolbar)) {	
+		//store the state variables
+		var currentState = getSettings(songList, inputSignature, inputTempo, loopButton);
+		// disable controls (except for stop, mute) while playing
+		filterControls(controls, [stopButton, muteButton], "off");
+		// kick off the slideshow
+		getChords(currentState.currentSong, currentState.signature, currentState.interval, currentState.looping, play);
+	}
+});
+stopButton.addEventListener("click",function(){
+	stopAll();
+	reset();
+});
+
 
 // update time signature and tempo to match current inputs
 function getSettings(songControl, signatureControl, tempoControl, loopingControl){
@@ -124,36 +136,19 @@ function muteUnmute(button, sound){
 // enforce min and max on number input
 function enforceMinMax(input, disabledAction, referenceDiv) {
 	if(parseInt(input.value) > parseInt(input.max) || parseInt(input.value) < parseInt(input.min) || input.value == "") {
-		warning = document.createElement("h2")
+		warning = document.createElement("span")
 		warning.style.float = "right";
-		warning.innerHTML = `⚠️ Value for ${input.id} must be between ${input.min} and ${input.max}.`
+		warning.innerHTML = `⚠️ Value for ${input.id} must be between ${input.min} and ${input.max}`
 		document.body.insertBefore(warning, referenceDiv.nextSibling)
 		disabledAction.disabled = true;
 		setTimeout(function(){
 			disabledAction.disabled = false;
 			warning.remove();
-		},2000)
+		}, 2000)
 		return false;
 	} else {
 		return true;
 	}}
-
-// after hitting start, disable controls, get chords from the JSON file, and play
-function start(){
-	// check that inputs are valid before proceeding
-	if (enforceMinMax(inputTempo, startButton, toolbar)) {	
-		//store the state variables
-		var currentState = getSettings(songList, inputSignature, inputTempo, loopButton); // get user inputs
-		var currentSong = currentState.currentSong;
-		var currentSignature = currentState.signature;
-		var currentInterval = currentState.interval;
-		var isLooping = currentState.looping;
-		// disable controls (except for stop, mute) while playing
-		filterControls(controls, [stopButton, muteButton], "off"); // disable inputs except stop and mute
-		// kick off the slideshow
-		getChords(currentSong, currentSignature, currentInterval, isLooping, play); // make the ajax call and play slideshow
-	}
-}
 
 function stopAll(){
 	// clear all the timers and reset
@@ -163,7 +158,6 @@ function stopAll(){
 	    clearTimeout(i);
 	}
 
-	reset();
 }
 
 // to reset: hide the progress bar and circles, start slideshow with blank images
@@ -171,29 +165,22 @@ function reset(){
 	filterControls(controls, [stopButton], "on");
 	progressBox.style.display = "none";
 	progressBar.style.flexBasis = "0%";
-	circles.forEach(circle => circle.style.fill = `none`);
-	circles.forEach(circle => circle.style.display = `none`);
-	firstImg.src = blankPath;
-	secondImg.src = blankPath;
-	thirdImg.src = blankPath;
+	images.forEach(image => image.src = blankPath);
 	}
 
 function progress(sequence,onDeck,looping){
+	// move slides to the left
+	images[0].src = images[1].src
+	images[1].src = images[2].src
 	// if there are slides remaining, add the next one on deck
 	if (onDeck < Object.keys(sequence.chords).length){
-		firstImg.src = secondImg.src
-		secondImg.src = thirdImg.src
-		thirdImg.src = `images/tabs/${sequence.chords[onDeck].item}.jpeg`
+		images[2].src = `images/tabs/${sequence.chords[onDeck].item}.jpeg`
 	// if looping, go back to the start
 	} else if (looping == true){
-		firstImg.src = secondImg.src
-		secondImg.src = thirdImg.src
-		thirdImg.src = `images/tabs/${sequence.chords[0].item}.jpeg`
+		images[2].src = `images/tabs/${sequence.chords[0].item}.jpeg`
 	// otherwise, add blank slide
 	} else {
-		firstImg.src = secondImg.src
-		secondImg.src = thirdImg.src
-		thirdImg.src = blankPath
+		images[2].src = blankPath
 	}
 }
 
@@ -266,6 +253,8 @@ function clickCircles(interval, signature, svgs, thisDiv, nextDiv, sound){
 			// at the end of this chord's duration, stop
 			clearInterval(update)
 			thisDiv.style.display = "none"
+			svgs.forEach(circle => circle.style.fill = `none`);
+			svgs.forEach(circle => circle.style.display = `none`);
 			nextDiv.style.display = "flex"}
 		num += 1
 		}
