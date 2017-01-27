@@ -6,9 +6,12 @@ timed slideshow plays through chord changes for a library of songs. current impl
 
 ## instructions
 
-download all files and run index.html in browser.
+npm install and run node index.js
 
-files:
+compatibility: tested for Chrome (v55)
+
+## files
+
 * index.html
 * sliderstyle.css
 * javascript folder: contains elements.js (identifies page elements) and slider.js (includes functions to control and play the slideshow)
@@ -17,5 +20,3 @@ files:
 * library folder: contains JSON files, each representing a song with chord progression and duration (# measures) for each chord
 * mocha_tests.html: mocha test runner
 * test folder: contains .js files for mocha test suite
-
-compatibility: tested for Chrome (v55)
