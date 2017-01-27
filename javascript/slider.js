@@ -15,7 +15,7 @@ startButton.addEventListener("click",function(){
 });
 stopButton.addEventListener("click",function(){
 	stopAll();
-	reset(controls, [stopButton], [progressBox], images, blankPath);
+	reset(controls, [stopButton], [progressBox, countin], images, blankPath);
 });
 
 
@@ -255,7 +255,7 @@ function endSong(sequence, signature, interval, duration){
 	duration += sequence.chords[Object.keys(sequence.chords).length-1].bars*(signature*interval);
 	// schedule reset 
 	setTimeout(function(){
-		reset(controls, [stopButton], [progressBox], images, blankPath);
+		reset(controls, [stopButton], [progressBox, countin], images, blankPath);
 	},duration)}
 
 
